@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `inventario_pc` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `inventario_pc`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: inventario_pc
@@ -278,14 +280,6 @@ LOCK TABLES `ventas` WRITE;
 INSERT INTO `ventas` VALUES (1,2,'2025-08-17 18:00:05',540.00),(2,3,'2025-08-17 18:00:05',450.00);
 /*!40000 ALTER TABLE `ventas` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'inventario_pc'
---
-
---
--- Dumping routines for database 'inventario_pc'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -296,4 +290,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-17 19:01:43
+-- Dump completed on 2025-08-18 23:01:52

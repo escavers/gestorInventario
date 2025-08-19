@@ -13,8 +13,7 @@ router.get("/", (req, res) => {
 
 router.get("/detalles", (req, res) => {
   const sql = `
-    SELECT c.id_compra, c.fecha, u.nombre AS usuario, pr.nombre AS proveedor,
-           p.nombre AS producto, dc.cantidad, dc.precio_unitario, dc.subtotal, c.total
+    SELECT  dc.cantidad, dc.precio_unitario, dc.subtotal, c.total
     FROM compras c
     JOIN usuarios u ON c.id_usuario = u.id_usuario
     JOIN proveedores pr ON c.id_proveedor = pr.id_proveedor

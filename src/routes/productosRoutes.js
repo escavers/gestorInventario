@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../db");
 
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM productos", (err, results) => {
+  db.query("select nombre, descripcion, stock from productos", (err, results) => {
     if (err) throw err;
     res.json(results);
   });
