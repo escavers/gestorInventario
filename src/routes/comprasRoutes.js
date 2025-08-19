@@ -4,7 +4,7 @@ const db = require("../db");
 
 
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM compras", (err, results) => {
+  db.query("SELECT  fecha,total,id_usuario FROM compras", (err, results) => {
     if (err) throw err;
     res.json(results);
   });
