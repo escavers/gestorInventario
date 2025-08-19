@@ -20,4 +20,5 @@ app.use("/ventas", ventasRoutes);
 
 app.listen(puerto, () => {
     console.log(`Servidor corriendo en http://localhost:${puerto}`);
+
 });
