@@ -19,10 +19,6 @@ app.use("/compras", comprasRoutes);
 app.use("/ventas", ventasRoutes);
 
 app.listen(puerto, () => {
-    console.log(`Servidorificador  corriendose en http://localhost:${puerto}`);
+    console.log(`Servidor corriendo en http://localhost:${puerto}`);
 
-    console.log(`Servidor corriendoooooooooooooooo en http://localhost:${puerto}`);
-
-    console.log(`Servidor corriendose en http://localhost:${puerto}`);
- 
 });
