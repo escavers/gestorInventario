@@ -19,6 +19,7 @@ router.post("/", (req, res) => {
       console.log(err);
       return res.status(500).json({error: "Error en el Servidor"})
     }
+    
     res.status(201).json({message: "Categoria Creada Exitosamente!! :)", id: result.insertId})
   });
 });

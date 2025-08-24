@@ -11,5 +11,17 @@
   "dependencies": {
     "express": "^5.1.0",
     "mysql2": "^3.14.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/escavers/gestorInventario.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/escavers/gestorInventario/issues"
+  },
+  "homepage": "https://github.com/escavers/gestorInventario#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
