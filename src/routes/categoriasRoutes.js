@@ -10,6 +10,8 @@ router.get("/", (req, res) => {
   });
 });
 
+
+// POST
 router.post("/", (req, res) => {
   const { nombre } = req.body;
 
@@ -20,9 +22,11 @@ router.post("/", (req, res) => {
       return res.status(500).json({error: "Error en el Servidor"})
     }
     
-    res.status(201).json({message: "Categoria Creada Exitosamente!! :)", id: result.insertId})
+    res.status(201).json({message: "Categoria CREADA Exitosamente!! :)", id: result.insertId})
   });
 });
+
+//PUT
 
 router.put("/:id", (req, res) => {
   const { id } = req.params;
@@ -36,7 +40,21 @@ router.put("/:id", (req, res) => {
       console.log(err);
       return res.status(500).json({ error: "Error al Actualizar la Categoria" });
     }
-    res.status(201).json({ message: "La Categoria se actualizo Exitosamente!! :)" })
+    res.status(201).json({ message: "La Categoria se ACTUALIZO Exitosamente!! :)" })
+  });
+});
+
+//DELETE
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sql = "DELETE FROM categorias WHERE id_categoria = ?";
+  db.query(sql, [id], (err, resul) => {
+    if (err){
+      console.log(err);
+      return res.status(500).json({error: "No se pudo Eliminar la Categoria"})
+    }
+    res.status(201).json({message: "La Categoria se ELIMINO Correctamente"});
   });
 });
 

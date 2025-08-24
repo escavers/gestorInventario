@@ -82,4 +82,19 @@ router.put("/:id", (req, res) => {
 
 });
 
+//DELETE
+router.delete("/:id", (req, res) =>{
+  const { id } = req.params;
+
+  const sql = "DELETE FROM productos WHERE id_producto = ?";
+
+  db.query(sql, [id], (err, resul) => {
+    if (err){
+      console.log(err);
+      return res.status(500).json({error: "Error al Eliminar Producto"});
+    }
+    res.json({message: "Producto Eliminado"});
+  });
+});
+
 module.exports = router;
