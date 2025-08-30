@@ -18,7 +18,7 @@ app.use("/productos", productosRoutes);
 app.use("/compras", comprasRoutes);
 app.use("/ventas", ventasRoutes);
 
-app.listen(puerto, () => {
+app.listen(puerto, '0.0.0.0', () => {
     console.log(`Servidor corriendo en http://localhost:${puerto}`);
 
 });

@@ -170,6 +170,34 @@ router.delete("/:id", (req, res) => {
     });
   });
 });
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
 
+  const sql = `SELECT 
+      v.id_venta,
+      v.fecha,
+      u.nombre AS vendedor,
+      p.nombre AS producto,
+      c.nombre AS categoria,
+      p.descripcion,
+      dv.cantidad,
+      dv.precio_unitario,
+      dv.subtotal,
+      v.total AS total_venta
+      FROM ventas v
+      INNER JOIN usuarios u ON v.id_usuario = u.id_usuario
+      INNER JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
+      INNER JOIN productos p ON dv.id_producto = p.id_producto
+      INNER JOIN categorias c ON p.id_categoria = c.id_categoria
+      WHERE v.id_venta = ?;`
+
+    db.query(sql, [id], (err, resul) => {
+      if (err){
+        console.log(err);
+        return res.status(500).json({error: "Error al mostrar DATOS"});
+      }
+      res.json(resul);
+    });
+});
 
 module.exports = router;
