@@ -47,14 +47,14 @@ router.put("/:id", (req, res) => {
 //DELETE
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-
-  const sql = "DELETE FROM categorias WHERE id_categoria = ?";
+  //const { estado } = req.body;
+  const sql = "UPDATE categorias SET estado = 0 WHERE id_categoria = ?";
   db.query(sql, [id], (err, resul) => {
     if (err){
       console.log(err);
       return res.status(500).json({error: "No se pudo Eliminar la Categoria"})
     }
-    res.status(201).json({message: "La Categoria se ELIMINO Correctamente"});
+    res.status(200).json({message: "La Categoria se ELIMINO Correctamente"});
   });
 });
 
