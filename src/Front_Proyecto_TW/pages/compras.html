@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Compras</title>
+  <style>
+  /*body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .form-section, .list-section {
+      margin-bottom: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: inline-block;
+      width: 150px;
+      font-weight: bold;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .delete-btn {
+      background-color: #dc3545;
+    }
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    .success {
+      color: green;
+      font-size: 14px;
+    } */
+  </style> 
+</head>
+<body>
+  <header>
+    <h1 class="logo">Gestión Inventario</h1>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="./usuarios.html">Usuarios</a>
+      <a href="./proveedores.html">Proveedores</a>
+      <a href="./productos.html">Productos</a>
+      <a href="./categorias.html">categorias</a>
+      <a href="./ventas.html">Ventas</a>
+      <a href="./compras.html">Compras</a>
+      
+    <!--  <a href="">Ventas</a> -->
+    </nav>
+  </header>
+  <h1>Gestión de Compras</h1>
+
+  <!-- Formulario para crear/actualizar compra -->
+  <div class="form-section">
+    <h2>Crear/Actualizar Compra</h2>
+    <form id="compraForm">
+      <div class="form-group">
+        <label for="id_compra">ID Compra:</label>
+        <input type="number" id="id_compra" readonly>
+      </div>
+      <div class="form-group">
+        <label for="id_usuario">ID Usuario:</label>
+        <input type="number" id="id_usuario" required>
+      </div>
+      <div class="form-group">
+        <label for="id_proveedor">ID Proveedor:</label>
+        <input type="number" id="id_proveedor" required>
+      </div>
+      <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="datetime-local" id="fecha" required>
+      </div>
+      <button type="submit">Guardar Compra</button>
+      <button type="button" id="resetCompraForm">Limpiar</button>
+    </form>
+    <div id="compraMessage" class="message"></div>
+  </div>
+
+  <!-- Formulario para crear/actualizar detalle de compra -->
+  <div class="form-section">
+    <h2>Crear/Actualizar Detalle de Compra</h2>
+    <form id="detalleForm">
+      <div class="form-group">
+        <label for="id_detalle">ID Detalle:</label>
+        <input type="number" id="id_detalle" readonly>
+      </div>
+      <div class="form-group">
+        <label for="detalle_id_compra">ID Compra:</label>
+        <input type="number" id="detalle_id_compra" required>
+      </div>
+      <div class="form-group">
+        <label for="id_producto">ID Producto:</label>
+        <input type="number" id="id_producto" required>
+      </div>
+      <div class="form-group">
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" min="1" required>
+      </div>
+      <div class="form-group">
+        <label for="precio_unitario">Precio Unitario:</label>
+        <input type="number" id="precio_unitario" step="0.01" min="0.01" required>
+      </div>
+      <button type="submit">Guardar Detalle</button>
+      <button type="button" id="resetDetalleForm">Limpiar</button>
+    </form>
+    <div id="detalleMessage" class="message"></div>
+  </div>
+
+  <!-- Lista de compras -->
+  <div class="list-section">
+    <h2>Lista de Compras</h2>
+    <table id="comprasTable">
+      <thead>
+        <tr>
+          <th>ID Compra</th>
+          <th>ID Usuario</th>
+          <th>ID Proveedor</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Lista de detalles de compra -->
+  <div class="list-section">
+    <h2>Lista de Detalles de Compra</h2>
+    <table id="detallesTable">
+      <thead>
+        <tr>
+          <th>ID Detalle</th>
+          <th>ID Compra</th>
+          <th>ID Producto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Subtotal</th>
+          <th>Total Compra</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/compras';
+
+    // Cargar listas al inicio
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCompras();
+      loadDetalles();
+    });
+
+    // Formulario de compra
+    document.getElementById('compraForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id_compra = document.getElementById('id_compra').value;
+      const id_usuario = document.getElementById('id_usuario').value;
+      const id_proveedor = document.getElementById('id_proveedor').value;
+      const fecha = document.getElementById('fecha').value;
+
+      const data = { id_usuario, id_proveedor, fecha };
+      const messageDiv = document.getElementById('compraMessage');
+
+      try {
+        let response;
+        if (id_compra) {
+          // Actualizar compra
+          response = await fetch(`${API_URL}/${id_compra}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        } else {
+          // Crear compra
+          response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+
+        const result = await response.json();
+        if (response.ok) {
+          messageDiv.className = 'success';
+          messageDiv.textContent = result.message;
+          resetCompraForm();
+          loadCompras();
+        } else {
+          messageDiv.className = 'error';
+          messageDiv.textContent = result.error || 'Error al procesar la compra';
+        }
+      } catch (error) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Error de conexión';
+      }
+    });
+
+    // Formulario de detalle
+    document.getElementById('detalleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id_detalle = document.getElementById('id_detalle').value;
+      const id_compra = document.getElementById('detalle_id_compra').value;
+      const id_producto = document.getElementById('id_producto').value;
+      const cantidad = document.getElementById('cantidad').value;
+      const precio_unitario = document.getElementById('precio_unitario').value;
+
+      const data = { id_compra, id_producto, cantidad, precio_unitario };
+      const messageDiv = document.getElementById('detalleMessage');
+
+      try {
+        let response;
+        if (id_detalle) {
+          // Actualizar detalle
+          response = await fetch(`${API_URL}/detalles/${id_detalle}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        } else {
+          // Crear detalle
+          response = await fetch(`${API_URL}/detalles`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+
+        const result = await response.json();
+        if (response.ok) {
+          messageDiv.className = 'success';
+          messageDiv.textContent = result.message;
+          resetDetalleForm();
+          loadDetalles();
+          loadCompras(); // Actualizar totales
+        } else {
+          messageDiv.className = 'error';
+          messageDiv.textContent = result.error || 'Error al procesar el detalle';
+        }
+      } catch (error) {
+        messageDiv.className = 'error';
+        messageDiv.textContent = 'Error de conexión';
+      }
+    });
+
+    // Cargar lista de compras
+    async function loadCompras() {
+      try {
+        const response = await fetch(API_URL);
+        const compras = await response.json();
+        const tbody = document.querySelector('#comprasTable tbody');
+        tbody.innerHTML = '';
+        compras.forEach(compra => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${compra.id_compra}</td>
+            <td>${compra.id_usuario}</td>
+            <td>${compra.id_proveedor}</td>
+            <td>${new Date(compra.fecha).toLocaleString()}</td>
+            <td>${compra.total}</td>
+            <td>
+              <button onclick="editCompra(${compra.id_compra}, ${compra.id_usuario}, ${compra.id_proveedor}, '${compra.fecha}')">Editar</button>
+              <button class="delete-btn" onclick="deleteCompra(${compra.id_compra})">Eliminar</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error loading compras:', error);
+      }
+    }
+
+    // Cargar lista de detalles
+    async function loadDetalles() {
+      try {
+        const response = await fetch(`${API_URL}/detalles`);
+        const detalles = await response.json();
+        const tbody = document.querySelector('#detallesTable tbody');
+        tbody.innerHTML = '';
+        detalles.forEach(detalle => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${detalle.id_detalle}</td>
+            <td>${detalle.id_compra}</td>
+            <td>${detalle.id_producto}</td>
+            <td>${detalle.cantidad}</td>
+            <td>${detalle.precio_unitario}</td>
+            <td>${detalle.subtotal}</td>
+            <td>${detalle.total}</td>
+            <td>
+              <button onclick="editDetalle(${detalle.id_detalle}, ${detalle.id_compra}, ${detalle.id_producto}, ${detalle.cantidad}, ${detalle.precio_unitario})">Editar</button>
+              <button class="delete-btn" onclick="deleteDetalle(${detalle.id_detalle})">Eliminar</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error loading detalles:', error);
+      }
+    }
+
+    // Editar compra
+    function editCompra(id_compra, id_usuario, id_proveedor, fecha) {
+      document.getElementById('id_compra').value = id_compra;
+      document.getElementById('id_usuario').value = id_usuario;
+      document.getElementById('id_proveedor').value = id_proveedor;
+      document.getElementById('fecha').value = fecha.slice(0, 16); // Formato para datetime-local
+    }
+
+    // Editar detalle
+    function editDetalle(id_detalle, id_compra, id_producto, cantidad, precio_unitario) {
+      document.getElementById('id_detalle').value = id_detalle;
+      document.getElementById('detalle_id_compra').value = id_compra;
+      document.getElementById('id_producto').value = id_producto;
+      document.getElementById('cantidad').value = cantidad;
+      document.getElementById('precio_unitario').value = precio_unitario;
+    }
+
+    // Eliminar compra
+    async function deleteCompra(id_compra) {
+      if (!confirm('¿Estás seguro de eliminar esta compra y sus detalles?')) return;
+      try {
+        const response = await fetch(`${API_URL}/${id_compra}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        if (response.ok) {
+          document.getElementById('compraMessage').className = 'success';
+          document.getElementById('compraMessage').textContent = result.message;
+          loadCompras();
+          loadDetalles();
+        } else {
+          document.getElementById('compraMessage').className = 'error';
+          document.getElementById('compraMessage').textContent = result.error || 'Error al eliminar la compra';
+        }
+      } catch (error) {
+        document.getElementById('compraMessage').className = 'error';
+        document.getElementById('compraMessage').textContent = 'Error de conexión';
+      }
+    }
+
+    // Eliminar detalle
+    async function deleteDetalle(id_detalle) {
+      if (!confirm('¿Estás seguro de eliminar este detalle?')) return;
+      try {
+        const response = await fetch(`${API_URL}/detalles/${id_detalle}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+        if (response.ok) {
+          document.getElementById('detalleMessage').className = 'success';
+          document.getElementById('detalleMessage').textContent = result.message;
+          loadDetalles();
+          loadCompras(); // Actualizar totales
+        } else {
+          document.getElementById('detalleMessage').className = 'error';
+          document.getElementById('detalleMessage').textContent = result.error || 'Error al eliminar el detalle';
+        }
+      } catch (error) {
+        document.getElementById('detalleMessage').className = 'error';
+        document.getElementById('detalleMessage').textContent = 'Error de conexión';
+      }
+    }
+
+    // Limpiar formulario de compra
+    document.getElementById('resetCompraForm').addEventListener('click', resetCompraForm);
+    function resetCompraForm() {
+      document.getElementById('compraForm').reset();
+      document.getElementById('id_compra').value = '';
+      document.getElementById('compraMessage').textContent = '';
+    }
+
+    // Limpiar formulario de detalle
+    document.getElementById('resetDetalleForm').addEventListener('click', resetDetalleForm);
+    function resetDetalleForm() {
+      document.getElementById('detalleForm').reset();
+      document.getElementById('id_detalle').value = '';
+      document.getElementById('detalleMessage').textContent = '';
+    }
+  </script>
+</body>
+</html>

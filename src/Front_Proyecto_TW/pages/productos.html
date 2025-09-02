@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba API Productos</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    header {
+      background: #333;
+      padding: 10px 20px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo {
+      margin: 0;
+      font-size: 20px;
+      color: #ddd;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 16px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 class="logo">Gestión Inventario</h1>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="./usuarios.html">Usuarios</a>
+      <a href="./proveedores.html">Proveedores</a>
+      <a href="./productos.html">Productos</a>
+      <a href="./categorias.html">categorias</a>
+      <a href="./ventas.html">Ventas</a>
+      <a href="./compras.html">Compras</a>
+    <!--  <a href="">Ventas</a> -->
+    </nav>
+  </header>
+  <h1>CRUD Productos</h1>
+
+  <!-- GET productos -->
+  <button onclick="getProductos()">Obtener Productos</button>
+  <pre id="resultado"></pre>
+
+  <hr>
+
+  <!-- POST producto -->
+  <h2>Crear Producto</h2>
+  <form id="formCrear">
+    <input type="text" name="nombre" placeholder="Nombre" required><br>
+    <input type="text" name="descripcion" placeholder="Descripción"><br>
+    <input type="number" name="stock" placeholder="Stock"><br>
+    <input type="number" name="precio_venta" placeholder="Precio Venta"><br>
+    <input type="number" name="id_categoria" placeholder="ID Categoría"><br>
+    <input type="number" name="id_proveedor" placeholder="ID Proveedor (opcional)"><br>
+    <input type="number" name="precio_costo" placeholder="Precio Costo (opcional)"><br>
+    <button type="submit">Crear</button>
+  </form>
+
+  <hr>
+
+  <!-- PUT producto -->
+  <h2>Actualizar Producto</h2>
+  <form id="formUpdate">
+    <input type="number" name="id" placeholder="ID Producto" required><br>
+    <input type="text" name="nombre" placeholder="Nombre"><br>
+    <input type="text" name="descripcion" placeholder="Descripción"><br>
+    <input type="number" name="stock" placeholder="Stock"><br>
+    <input type="number" name="precio_venta" placeholder="Precio Venta"><br>
+    <input type="number" name="id_categoria" placeholder="ID Categoría"><br>
+    <input type="number" name="estado" placeholder="Estado (1=activo, 0=inactivo)"><br>
+    <button type="submit">Actualizar</button>
+  </form>
+
+  <hr>
+
+  <!-- DELETE producto -->
+  <h2>Eliminar Producto</h2>
+  <form id="formDelete">
+    <input type="number" name="id" placeholder="ID Producto" required><br>
+    <button type="submit">Eliminar</button>
+  </form>
+
+
+
+
+ <!------------------------------------------------------------------------> 
+ <!------------------------------------------------------------------------> 
+ <!------------------------------------------------------------------------> 
+                <!--        SCRIPTS DEL PROGRAMA            -->
+ <!------------------------------------------------------------------------> 
+ <!------------------------------------------------------------------------> 
+ <!------------------------------------------------------------------------> 
+  <script>
+    const API = "http://localhost:3000/productos"; //apunta a tu backend (al ENDPOINT de Productos)
+
+    // ---- GET ----
+    function getProductos() {
+      fetch(API)
+        
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("resultado").textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(err => console.error("Error GET:", err));
+    }
+
+    // ---- POST ----
+    document.getElementById("formCrear").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target).entries());
+      fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(res => res.json())
+      .then(data => alert("Respuesta backend:\n" + JSON.stringify(data, null, 2)))
+      .catch(err => console.error("Error POST:", err));
+    });
+
+    // ---- PUT ----
+    document.getElementById("formUpdate").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target).entries());
+      const id = formData.id;
+      delete formData.id;
+      fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(res => res.json())
+      .then(data => alert("Respuesta backend:\n" + JSON.stringify(data, null, 2)))
+      .catch(err => console.error("Error PUT:", err));
+    });
+
+    // ---- DELETE ----
+    document.getElementById("formDelete").addEventListener("submit", e => {
+      e.preventDefault();
+      const id = new FormData(e.target).get("id");
+      fetch(`${API}/${id}`, { method: "DELETE" })
+        .then(res => res.json())
+        .then(data => alert("Respuesta backend:\n" + JSON.stringify(data, null, 2)))
+        .catch(err => console.error("Error DELETE:", err));
+    });
+  </script>
+</body>
+</html>

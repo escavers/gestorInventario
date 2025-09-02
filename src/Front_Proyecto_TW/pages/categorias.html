@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD Categorías</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { margin: 5px; padding: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+  </style>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    header {
+      background: #333;
+      padding: 10px 20px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo {
+      margin: 0;
+      font-size: 20px;
+      color: #ddd;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 16px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="logo">Gestión Inventario</h1>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="./usuarios.html">Usuarios</a>
+      <a href="./proveedores.html">Proveedores</a>
+      <a href="./productos.html">Productos</a>
+      <a href="./categorias.html">categorias</a>
+      <a href="./ventas.html">Ventas</a>
+    <!--  <a href="">Ventas</a> -->
+    </nav>
+  </header>
+  <h1>Gestión de Categorías</h1>
+
+  <div>
+    <input type="text" id="nombreCategoria" placeholder="Nombre de categoría">
+    <button onclick="crearCategoria()">Agregar</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tablaCategorias"></tbody>
+  </table>
+
+  <script>
+    const API_URL = "http://localhost:3000/categorias"; //conexion con backend
+
+    // Obtener categorías
+    async function obtenerCategorias() {
+      const res = await fetch(API_URL);
+      const categorias = await res.json();
+
+      const tbody = document.getElementById("tablaCategorias");
+      tbody.innerHTML = "";
+
+      categorias.forEach(cat => {
+        const fila = `
+          <tr>
+            <td>${cat.id_categoria}</td>
+            <td><input type="text" id="nombre-${cat.id_categoria}" value="${cat.nombre}"></td>
+            <td>
+              <button onclick="actualizarCategoria(${cat.id_categoria})">Actualizar</button>
+              <button onclick="eliminarCategoria(${cat.id_categoria})">Eliminar</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += fila;
+      });
+    }
+
+    // Crear categoría
+    async function crearCategoria() {
+      const nombre = document.getElementById("nombreCategoria").value;
+      if (!nombre) return alert("Escribe un nombre");
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      obtenerCategorias();
+    }
+
+    // Actualizar categoría
+    async function actualizarCategoria(id) {
+      const nombre = document.getElementById(`nombre-${id}`).value;
+
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      obtenerCategorias();
+    }
+
+    // Eliminar categoría
+    async function eliminarCategoria(id) {
+      if (!confirm("¿Seguro que quieres eliminar esta categoría?")) return;
+
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      alert(data.message);
+      obtenerCategorias();
+    }
+
+    // Cargar categorías al inicio
+    obtenerCategorias();
+  </script>
+</body>
+</html>

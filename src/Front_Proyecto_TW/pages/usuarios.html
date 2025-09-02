@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Usuarios</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f9; }
+    h1 { text-align: center; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 10px; text-align: center; }
+    th { background: #eee; }
+    form { background: #fff; padding: 15px; margin-top: 20px; border: 1px solid #ccc; }
+    input, select { margin: 5px; padding: 8px; width: 90%; }
+    button { padding: 8px 12px; margin: 5px; cursor: pointer; }
+    .actions button { margin: 0 5px; }
+  </style>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    header {
+      background: #333;
+      padding: 10px 20px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo {
+      margin: 0;
+      font-size: 20px;
+      color: #ddd;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 16px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="logo">Gestión Inventario</h1>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="./usuarios.html">Usuarios</a>
+      <a href="./proveedores.html">Proveedores</a>
+      <a href="./productos.html">Productos</a>
+      <a href="./categorias.html">categorias</a>
+      <a href="./ventas.html">Ventas</a>
+      <a href="./compras.html">Compras</a>
+      
+    <!--  <a href="">Ventas</a> -->
+    </nav>
+  </header>
+
+
+  <h1>Gestión de Usuarios</h1>
+
+  <h2>Lista de Usuarios</h2>
+  <table id="tablaUsuarios">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Agregar / Editar Usuario</h2>
+  <form id="formUsuario">
+    <input type="hidden" id="idUsuario">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="email" id="correo" placeholder="Correo" required>
+    <input type="password" id="contraseña" placeholder="Contraseña" required>
+    <select id="rol" required>
+      <option value="">Seleccione un rol</option>
+      <option value="admin">Admin</option>
+      <option value="empleado">Empleado</option>
+    </select>
+    <button type="submit">Guardar</button>
+    <button type="button" onclick="limpiarFormulario()">Cancelar</button>
+  </form>
+
+  <script>
+    //const API_URL = "http://localhost:3000/usuarios"; // tu backend con CORS habilitado
+    const API_URL = "/usuarios"; // tu backend con CORS habilitado
+
+    const tablaUsuarios = document.querySelector("#tablaUsuarios tbody");
+    const form = document.getElementById("formUsuario");
+
+    async function cargarUsuarios() {
+      tablaUsuarios.innerHTML = "";
+      const res = await fetch(API_URL);
+      const usuarios = await res.json();
+
+      usuarios.forEach(u => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${u.id_usuario}</td>
+          <td>${u.nombre}</td>
+          <td>${u.correo}</td>
+          <td>${u.rol}</td>
+          <td class="actions">
+            <button onclick="editarUsuario(${u.id_usuario}, '${u.nombre}', '${u.correo}', '${u.rol}')">Editar</button>
+            <button onclick="eliminarUsuario(${u.id_usuario})">Eliminar</button>
+          </td>
+        `;
+        tablaUsuarios.appendChild(fila);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById("idUsuario").value;
+      const nombre = document.getElementById("nombre").value;
+      const correo = document.getElementById("correo").value;
+      const contraseña = document.getElementById("contraseña").value;
+      const rol = document.getElementById("rol").value;
+
+      const usuario = { nombre, correo, contraseña, rol };
+
+      if (id) {
+        // UPDATE
+        await fetch(`${API_URL}/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(usuario),
+        });
+      } else {
+        // INSERT
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(usuario),
+        });
+      }
+
+      limpiarFormulario();
+      cargarUsuarios();
+    });
+
+    function editarUsuario(id, nombre, correo, rol) {
+      document.getElementById("idUsuario").value = id;
+      document.getElementById("nombre").value = nombre;
+      document.getElementById("correo").value = correo;
+      document.getElementById("contraseña").value = ""; // no mostrar contraseña
+      document.getElementById("rol").value = rol;
+    }
+
+    async function eliminarUsuario(id) {
+      if (confirm("¿Seguro que deseas eliminar este usuario?")) {
+        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        cargarUsuarios();
+      }
+    }
+
+    function limpiarFormulario() {
+      form.reset();
+      document.getElementById("idUsuario").value = "";
+    }
+
+    // Inicializar
+    cargarUsuarios();
+  </script>
+</body>
+</html>
